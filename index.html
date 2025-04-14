@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>To-Do List with Alarm</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      margin-top: 50px;
+    }
+
+    .container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      width: 350px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+    }
+
+    input[type="text"],
+    input[type="datetime-local"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      width: 100%;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #218838;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin-top: 20px;
+    }
+
+    li {
+      background: #f9f9f9;
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+    }
+
+    .delete {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      padding: 5px 8px;
+      cursor: pointer;
+    }
+
+    .delete:hover {
+      background-color: #c82333;
+    }
+
+    .task-info {
+      flex-grow: 1;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>To-Do List with Alarm</h2>
+    <input type="text" id="taskInput" placeholder="Enter a task">
+    <input type="datetime-local" id="taskTime">
+    <button onclick="addTask()">Add Task</button>
+    <ul id="taskList"></ul>
+  </div>
+
+  <!-- Alarm Sound -->
+  <audio id="alarmSound" src="https://www.soundjay.com/buttons/sounds/beep-07.mp3" preload="auto"></audio>
+
+  <script>
+    let tasks = [];
+
+    function addTask() {
+      const taskInput = document.getElementById("taskInput");
+      const timeInput = document.getElementById("taskTime");
+      const taskText = taskInput.value.trim();
+      const taskTime = timeInput.value;
+
+      if (!taskText || !taskTime) {
+        alert("Please enter both task and time.");
+        return;
+      }
+
+      const listItem = document.createElement("li");
+      listItem.innerHTML = `
+        <div class="task-info">
+          <strong>${taskText}</strong><br>
+          <small>${new Date(taskTime).toLocaleString()}</small>
+        </div>
+        <button class="delete" onclick="removeTask(this)">X</button>
+      `;
+
+      document.getElementById("taskList").appendChild(listItem);
+
+      tasks.push({
+        text: taskText,
+        time: new Date(taskTime),
+        reminded: false
+      });
+
+      taskInput.value = "";
+      timeInput.value = "";
+    }
+
+    function removeTask(button) {
+      const li = button.parentElement;
+      const index = Array.from(li.parentElement.children).indexOf(li);
+      tasks.splice(index, 1);
+      li.remove();
+    }
+
+    // Reminder checker
+    setInterval(() => {
+      const now = new Date();
+      tasks.forEach(task => {
+        if (!task.reminded && task.time <= now) {
+          alert(🔔 Reminder: ${task.text});
+          document.getElementById("alarmSound").play();
+          task.reminded = true;
+        }
+      });
+    }, 30000); // Checks every 30 seconds
+  </script>
+</body>
+</html>
