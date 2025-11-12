@@ -1,0 +1,9 @@
+import time
+
+while True:
+    ir_value = int(input("Enter 0 for obstacle, 1 for no obstacle: "))
+    if ir_value == 0:
+        print("Obstacle detected → LED ON")
+    else:
+        print("No obstacle → LED OFF")
+    time.sleep(1)
