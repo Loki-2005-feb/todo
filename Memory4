@@ -1,0 +1,64 @@
+def first_fit(blocks,processes):
+	allocation = [-1] * len(processes)
+	for i in range(len(processes)):
+		for j in range(len(blocks)):
+			if blocks[j] >= processes[i]:
+				allocation[i] = j
+				blocks[j] -= processes[i]
+				break
+	return allocation
+
+def next_fit(blocks, processes):
+	allocation = [-1] * len(processes)
+	j = 0
+	n = len(blocks)
+	for i in range(len(processes)):
+		count = 0
+		while count < n:
+			if blocks[j] >= processes[i]:
+				allocation[i] = j
+				blocks[j] -= processes[i]
+				break
+			j = (j + 1) % n
+			count += 1
+	return allocation
+
+def best_fit(blocks,processes):
+	allocation = [-1] * len(processes)
+	for i in range(len(processes)):
+		best_index  = -1
+		for j in range(len(blocks)):
+			if blocks[j] >= processes[i]:
+				if best_index == -1 or blocks[j] < blocks[best_index]:
+					best_index = j
+			if best_index != -1:
+				allocation[i] = best_index
+				blocks[best_index] -= processes[i]
+	return allocation
+
+def worst_fit(blocks,processes):
+	allocation = [-1] * len(processes)
+	for i in range(len(processes)):
+		worst_index  = -1
+		for j in range(len(blocks)):
+			if blocks[j] >= processes[i]:
+				if worst_index == -1 or blocks[j] > blocks[worst_index]:
+					worst_index = j
+			if worst_index != -1:
+				allocation[i] = worst_index
+				blocks[worst_index] -= processes[i]
+	return allocation
+
+if __name__ == "__main__":
+	blocks = [100,500,200,400,600]
+	processes = [217,415,350,540,670]
+	
+	print('\nFirst_fit allocation:')
+	alloc = first_fit(blocks.copy(),processes)
+	for i in range(len(processes)):
+		print(f'Process {i+1} -> Block {alloc[i]+1 if alloc [i]!= -1 else 'not allocated'}')
+	
+	print('\nN_fit allocation:')
+	alloc = next_fit(blocks.copy(),processes)
+	for i in range(len(processes)):
+		print(f'Process {i+1} -> Block {alloc[i]+1 if alloc [i]!= -1 else 'not allocated'}')
