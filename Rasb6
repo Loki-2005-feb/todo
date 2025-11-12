@@ -1,0 +1,6 @@
+import time
+
+file_name = input("Enter image name: ")
+print("Simulating camera capture...")
+time.sleep(2)
+print(f"Image '{file_name}.jpg' captured and saved successfully.")
