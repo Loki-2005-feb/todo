@@ -1,0 +1,76 @@
+def fcfs():
+    n = int(input("Enter number of processes: "))
+    bt = [int(input(f"BT for P{i+1}: ")) for i in range(n)]
+    wt = [0]*n
+    tat = [0]*n
+    for i in range(1, n): wt[i] = wt[i-1] + bt[i-1]
+    for i in range(n): tat[i] = wt[i] + bt[i]
+    print("\nP\tBT\tWT\tTAT")
+    for i in range(n): print(f"P{i+1}\t{bt[i]}\t{wt[i]}\t{tat[i]}")
+    print("Avg WT:", sum(wt)/n, "Avg TAT:", sum(tat)/n)
+
+def sjf():
+    n = int(input("Enter number of processes: "))
+    p = list(range(1, n+1))
+    bt = [int(input(f"BT for P{i}: ")) for i in p]
+    for i in range(n):
+        for j in range(i+1,n):
+            if bt[i]>bt[j]: bt[i],bt[j],p[i],p[j]=bt[j],bt[i],p[j],p[i]
+    wt=[0]*n; tat=[0]*n
+    for i in range(1,n): wt[i]=wt[i-1]+bt[i-1]
+    for i in range(n): tat[i]=wt[i]+bt[i]
+    print("\nP\tBT\tWT\tTAT")
+    for i in range(n): print(f"P{p[i]}\t{bt[i]}\t{wt[i]}\t{tat[i]}")
+    print("Avg WT:", sum(wt)/n, "Avg TAT:", sum(tat)/n)
+
+def priority():
+    n = int(input("Enter number of processes: "))
+    p = list(range(1, n+1))
+    bt = []; pr = []
+    for i in range(n):
+        bt.append(int(input(f"BT for P{i+1}: ")))
+        pr.append(int(input(f"Priority for P{i+1}: ")))
+    for i in range(n):
+        for j in range(i+1,n):
+            if pr[i]>pr[j]:
+                pr[i],pr[j],bt[i],bt[j],p[i],p[j]=pr[j],pr[i],bt[j],bt[i],p[j],p[i]
+    wt=[0]*n; tat=[0]*n
+    for i in range(1,n): wt[i]=wt[i-1]+bt[i-1]
+    for i in range(n): tat[i]=wt[i]+bt[i]
+    print("\nP\tBT\tPR\tWT\tTAT")
+    for i in range(n): print(f"P{p[i]}\t{bt[i]}\t{pr[i]}\t{wt[i]}\t{tat[i]}")
+    print("Avg WT:", sum(wt)/n, "Avg TAT:", sum(tat)/n)
+
+def rr():
+    n=int(input("Enter number of processes: "))
+    p=list(range(1,n+1))
+    bt=[int(input(f"BT for P{i}: ")) for i in p]
+    rem=bt.copy()
+    q=int(input("Enter Time Quantum: "))
+    wt=[0]*n; t=0; done=False
+    while not done:
+        done=True
+        for i in range(n):
+            if rem[i]>0:
+                done=False
+                if rem[i]>q:
+                    t+=q
+                    rem[i]-=q
+                else:
+                    t+=rem[i]
+                    wt[i]=t-bt[i]
+                    rem[i]=0
+    tat=[bt[i]+wt[i] for i in range(n)]
+    print("\nP\tBT\tWT\tTAT")
+    for i in range(n): print(f"P{p[i]}\t{bt[i]}\t{wt[i]}\t{tat[i]}")
+    print("Avg WT:", sum(wt)/n, "Avg TAT:", sum(tat)/n)
+
+while True:
+    print("\n1.FCFS  2.SJF  3.Priority  4.Round Robin  5.Exit")
+    ch=int(input("Enter choice: "))
+    if ch==1: fcfs()
+    elif ch==2: sjf()
+    elif ch==3: priority()
+    elif ch==4: rr()
+    elif ch==5: break
+    else: print("Invalid choice")
