@@ -1,0 +1,101 @@
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <string>
+using namespace std;
+
+struct MNTEntry {
+    string name;
+    int mdtIndex;
+};
+
+vector<MNTEntry> MNT;
+vector<string> MDT;
+vector<string> expandedCode;
+
+void pass1() {
+    ifstream fin("input.asm");
+    ofstream mnt("mnt.txt"), mdt("mdt.txt"), inter("intermediate.txt");
+
+    string line;
+    int mdtp = 0;
+
+    while (getline(fin, line)) {
+        stringstream ss(line);
+        string word;
+        ss >> word;
+
+        if (word == "MACRO") {
+            getline(fin, line);
+            stringstream macroDef(line);
+            string name;
+            macroDef >> name;
+            MNT.push_back({name, mdtp});
+
+            MDT.push_back(line);
+            mdtp++;
+
+            while (getline(fin, line)) {
+                if (line == "MEND") {
+                    MDT.push_back(line);
+                    mdtp++;
+                    break;
+                }
+                MDT.push_back(line);
+                mdtp++;
+            }
+        } else {
+            inter << line << endl;
+        }
+    }
+
+    mnt << "----- MNT Table -----\nName\tMDT Index\n";
+    for (auto &m : MNT)
+        mnt << m.name << "\t" << m.mdtIndex << endl;
+
+    mdt << "----- MDT Table -----\n";
+    for (int i = 0; i < MDT.size(); i++)
+        mdt << i << "\t" << MDT[i] << endl;
+
+    fin.close(); mnt.close(); mdt.close(); inter.close();
+}
+
+void pass2() {
+    ifstream inter("intermediate.txt");
+    ofstream exp("expanded.asm");
+    string line;
+
+    while (getline(inter, line)) {
+        stringstream ss(line);
+        string word;
+        ss >> word;
+        bool expanded = false;
+
+        for (auto &m : MNT) {
+            if (word == m.name) {
+                int i = m.mdtIndex + 1;
+                while (MDT[i] != "MEND") {
+                    exp << MDT[i] << endl;
+                    i++;
+                }
+                expanded = true;
+                break;
+            }
+        }
+
+        if (!expanded)
+            exp << line << endl;
+    }
+
+    inter.close(); exp.close();
+}
+
+int main() {
+    pass1();
+    pass2();
+
+    cout << "Macro Pass 1 and Pass 2 executed successfully.\n";
+    cout << "Generated files: mnt.txt, mdt.txt, intermediate.txt, expanded.asm\n";
+    return 0;
+}
